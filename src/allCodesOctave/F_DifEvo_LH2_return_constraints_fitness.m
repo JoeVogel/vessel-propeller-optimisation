@@ -1,4 +1,4 @@
-function [D,Z,AEdAO,PdD,P_B] = F_DifEvo_LH2_return_constraints (V_S, csv_filename)
+function [D,Z,AEdAO,PdD,P_B] = F_DifEvo_LH2_return_constraints_fitness (V_S, csv_filename, has_initial_population, initial_population)
 % DIFFERENTIAL EVOLUTION Optimization Method
 % by Cr�stofer Hood Marques
 
@@ -44,40 +44,51 @@ VFpo = zeros(np,4);
 VFi2 = zeros(np,6);
 VFpo2 = zeros(np,6);
 
-% Initial population
 Xi = zeros(np,nv);
 of = 0;
-ofp = 0;
-for i = 1:np
-    # removed infinite generation
-    for j = 1:nv
-        %  create random Z
-        if j == 2
-            Xi(i,j) = randi([LimL(1,j) LimU(1,j)]);
-        else
-            Xi(i,j) = random('unif',LimL(1,j),LimU(1,j));
-            % Xi(i,j) = LimL(1,j);
-        end
-    end
-    ofp = ofp+1;
-    % [P_B,n,etaO,etaR, t075dD,tmin075dD, tal07R,cavLim, Vtip,Vtipmax]
-    [VFi(i,1),VFi(i,2),VFi(i,3),VFi(i,4),...
-      VFi2(i,1),VFi2(i,2),VFi2(i,3),VFi2(i,4),VFi2(i,5),VFi2(i,6)] = F_LabH2_return_constraints(V_S, Xi(i,1),Xi(i,2),Xi(i,3),Xi(i,4));
 
-    % save
-    fID = fopen(csv_filename,'a');
-    % D, Z, AEdAO, PdD,
-    fprintf(fID, '%f,%d,%f,%f,', Xi(i,1),Xi(i,2),Xi(i,3),Xi(i,4));
-    % P_B, n,etaO,etaR,
-    fprintf(fID, '%f,%f,%f,%f,', VFi(i,1),VFi(i,2),VFi(i,3),VFi(i,4));
-    % t075dD,tmin075dD, tal07R,cavLim, Vtip,Vtipmax,
-    fprintf(fID, '%f,%f,%f,%f,%f,%f,', VFi2(i,1),VFi2(i,2),VFi2(i,3),VFi2(i,4),VFi2(i,5),VFi2(i,6));
-    % fitness (P_B)
-    fprintf(fID, '%f,', VFpo(i,1));
-    % iteration, population i
-    fprintf(fID, '0,%d\n', i);
-    fclose(fID);
+% Initial population
+if has_initial_population
+    Xi = initial_population;
+    for p = 1:np
+        VFi(p,1) = 999.0;
+    end
+else
+    ofp = 0;
+
+    for i = 1:np
+        % removed infinite generation
+        for j = 1:nv
+            %  create random Z
+            if j == 2
+                Xi(i,j) = randi([LimL(1,j) LimU(1,j)]);
+            else
+                Xi(i,j) = random('unif',LimL(1,j),LimU(1,j));
+                % Xi(i,j) = LimL(1,j);
+            end
+        end
+        ofp = ofp+1;
+        % [P_B,n,etaO,etaR, t075dD,tmin075dD, tal07R,cavLim, Vtip,Vtipmax]
+        [VFi(i,1),VFi(i,2),VFi(i,3),VFi(i,4),...
+            VFi2(i,1),VFi2(i,2),VFi2(i,3),VFi2(i,4),VFi2(i,5),VFi2(i,6)] = F_LabH2_return_constraints(V_S, Xi(i,1),Xi(i,2),Xi(i,3),Xi(i,4));
+    
+        % save
+        fID = fopen(csv_filename,'a');
+        % D, Z, AEdAO, PdD,
+        fprintf(fID, '%f,%d,%f,%f,', Xi(i,1),Xi(i,2),Xi(i,3),Xi(i,4));
+        % P_B, n,etaO,etaR,
+        fprintf(fID, '%f,%f,%f,%f,', VFi(i,1),VFi(i,2),VFi(i,3),VFi(i,4));
+        % t075dD,tmin075dD, tal07R,cavLim, Vtip,Vtipmax,
+        fprintf(fID, '%f,%f,%f,%f,%f,%f,', VFi2(i,1),VFi2(i,2),VFi2(i,3),VFi2(i,4),VFi2(i,5),VFi2(i,6));
+        % fitness (P_B)
+        fprintf(fID, '%f,', VFpo(i,1));
+        % iteration, population i
+        fprintf(fID, '0,%d\n', i);
+        fclose(fID);
+    end
+
 end
+
 
 VFk = zeros(np,4,kmax);
 Xk = zeros(np,nv,kmax);
@@ -87,6 +98,8 @@ VFk(:,:,1) = VFi(:,:);
 Xk(:,:,1) = Xi(:,:);
 for k = 1:kmax
     display(k);
+    best_curr_fit = inf; % Inicializando com um valor alto
+    best_index = 0; % Inicializando o índice correspondente
     for i = 1:np
         alfa = randi(np,1);
         beta = randi(np,1);
@@ -153,15 +166,19 @@ for k = 1:kmax
         fclose(fID);
 
         % Verification of the function value
-        % P_B > 0
-        if VFpo(i,1) > 0
-            % minimal P_B
-            if curr_fit < VF(i,1)
-                X(i,:) = xpo(i,:);
-                VF(i,:) = VFpo(i,:);
-                VF(i,1) = curr_fit;
-            end
+        % minimal P_B
+        if curr_fit < VF(i,1)
+            X(i,:) = xpo(i,:);
+            VF(i,:) = VFpo(i,:);
+            VF(i,1) = curr_fit;
         end
+
+        % Se o curr_fit atual for menor que o melhor encontrado até agora
+        if curr_fit < best_curr_fit
+            best_curr_fit = curr_fit; % Atualiza o melhor curr_fit
+            best_index = i; % Atualiza o índice correspondente
+        end
+
         % --- Calculating fitness ---
     end
     VFk (:,:,k+1) = VF(:,:);
@@ -169,7 +186,8 @@ for k = 1:kmax
     % --- save
     fID = fopen(csv_filename,'a');
     fprintf(fID, 'best fit at iteration %d,', k);
-    fprintf(fID, '%f\n', VF(i,1));
+    %fprintf(fID, '%f\n', VF(i,1));
+    fprintf(fID, '%f\n', best_curr_fit);
     fclose(fID);
 
 end

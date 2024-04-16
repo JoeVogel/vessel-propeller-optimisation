@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 from oct2py import Oct2Py
 from multiprocessing import Pool
@@ -27,21 +28,36 @@ def parallel_seed_run(dir_vs, seed, V_S):
     create_config_file_DifEvo(dir_seed, SOLVER_NAME, V_S, NPOPULATION, MAX_ITERATION, seed, True)
 
     filename_allRun = dir_seed + '/' + 'allRunSaved_' + str(seed) + '.csv'
+    
+    initial_population_df = pd.read_csv('initial_populations.csv', header=0) 
+    
+    initial_population_df = initial_population_df.loc[initial_population_df['V_S'] == V_S]
+    initial_population_df = initial_population_df.loc[initial_population_df['Seed'] == seed]
+    
+    initial_population_df = initial_population_df.drop(columns=['V_S', 'Seed'])
+    
+    has_initial_population = False
+    
+    if len(initial_population_df.index) > 0:
+        initial_population = initial_population_df.to_numpy()
+        has_initial_population = True
+    else:
+        initial_population = None
 
     # run DE
     with Oct2Py() as octave:
         octave.warning ("off", "Octave:data-file-in-path");
         octave.addpath('./allCodesOctave');
         octave.eval('pkg load statistics')
-        D, Z, AEdAO, PdD, P_B = octave.F_DifEvo_LH2_return_constraints_fitness(V_S, filename_allRun, nout=5)
+        D, Z, AEdAO, PdD, P_B = octave.F_DifEvo_LH2_return_constraints_fitness(V_S, filename_allRun, has_initial_population, initial_population, nout=5)
 
-    best_result = (D, Z, AEdAO, PdD, P_B)
-    print("Best result", SOLVER_NAME)
-    print('P_B:',P_B)
-    print('D:',D)
-    print('AEdAO:',AEdAO)
-    print('PdD:',PdD)
-    print('Z:',Z)
+    # best_result = (D, Z, AEdAO, PdD, P_B)
+    # print("Best result", SOLVER_NAME)
+    # print('P_B:',P_B)
+    # print('D:',D)
+    # print('AEdAO:',AEdAO)
+    # print('PdD:',PdD)
+    # print('Z:',Z)
 
     # ======== Make CSV in same pattern as CMA-ES and OpenAI-ES ============
     col_names_DE = ['D', 'Z', 'AEdAO', 'PdD', 'P_B', 'n', 'etaO', 'etaR', 't075dD','tmin075dD', 'tal07R','cavLim', 'Vtip','Vtipmax', 'fitness', 'iteration', 'population_i']
@@ -138,8 +154,10 @@ def run_multiple_DifEvo_newFitness(NUMBER_OF_SEEDS_TO_RUN, V_S_list):
 if __name__ == '__main__':
     # run for this number of seeds
     NUMBER_OF_SEEDS_TO_RUN = 10
+    # NUMBER_OF_SEEDS_TO_RUN = 1
 
     # list of V_S, each V_S in the list will be run NUMBER_OF_SEEDS_TO_RUN times
     V_S_list = [7.0, 7.5, 8.0, 8.5]
+    # V_S_list = [8.0]
 
     run_multiple_DifEvo_newFitness(NUMBER_OF_SEEDS_TO_RUN, V_S_list)
