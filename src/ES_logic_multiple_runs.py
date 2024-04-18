@@ -93,9 +93,11 @@ def test_solver(solver):
     return (history, result[0])
 
 # ==== Logic ====
-def solver_for_Z(solver, z, dir_solver):
-    global Z
+def solver_for_Z(solver, z, dir_solver, vs, max_iteration):
+    global Z, V_S, MAX_ITERATION
     Z = z
+    V_S = vs
+    MAX_ITERATION = max_iteration
 
     # create the csv file with the headers
     global filename
@@ -134,7 +136,7 @@ def get_valid_results(results):
 
 # === Start ===
 def run_solver(dir_seed, solver, solver_name, vs, seed, n_population, max_iteration):
-    global V_S, NPOPULATION, MAX_ITERATION
+    # global V_S, NPOPULATION, MAX_ITERATION
     V_S = vs
     NPOPULATION = n_population
     MAX_ITERATION = max_iteration
@@ -143,8 +145,9 @@ def run_solver(dir_seed, solver, solver_name, vs, seed, n_population, max_iterat
 
     # run the solver in parallel
     results_list = []
+    
     with Pool() as pool:
-        solver_zs = [(solver, z, dir_seed) for z in range(range_Z[0],range_Z[1]+1)]
+        solver_zs = [(solver, z, dir_seed, V_S, MAX_ITERATION) for z in range(range_Z[0],range_Z[1]+1)]
         for result in pool.starmap(solver_for_Z, solver_zs):
             results_list.append(result)
 

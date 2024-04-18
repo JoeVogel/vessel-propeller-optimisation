@@ -40,7 +40,7 @@ def run_multiple_Cmaes(NUMBER_OF_SEEDS_TO_RUN, V_S_list, NPOPULATION, MAX_ITERAT
             cmaes = CMAES(NPARAMS,
                           x0=x0,                     # initial parameters values to generate the population
                           popsize=NPOPULATION,
-                          weight_decay=0.0,
+                          weight_decay=0.01,
                           sigma_init = SIGMA_INIT_CMAES,
                           lower_bounds=lower_bounds,
                           upper_bounds=upper_bounds,
@@ -61,9 +61,11 @@ def run_multiple_Cmaes(NUMBER_OF_SEEDS_TO_RUN, V_S_list, NPOPULATION, MAX_ITERAT
 if __name__ == '__main__':
     # run for this number of seeds
     NUMBER_OF_SEEDS_TO_RUN = 10
+    # NUMBER_OF_SEEDS_TO_RUN = 1
 
     # list of V_S, each V_S in the list will be run NUMBER_OF_SEEDS_TO_RUN times
     V_S_list = [7.0, 7.5, 8.0, 8.5]
+    # V_S_list = [7.0]
 
     # ES settings
     NPOPULATION   = 10 # size of population
