@@ -11,7 +11,11 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/src",
-            "purpose": ["debug-in-terminal"]
+            "purpose": ["debug-in-terminal"],
+            "args": ["-Xfrozen_modules=off"],
+            "env": {
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1"
+            }
         }
     ]
 }
