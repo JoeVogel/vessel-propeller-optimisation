@@ -1,0 +1,6 @@
+D = propeller diameter [m],AEdAO = expanded area ratio,PdD = pitch ratio,Z = propeller's number of blades,P_B = power brake,n = Propeller angular speed [rpm],fitness,t075dD,tmin075dD,tal07R,cavLim,Vtip,Vtipmax,penalty,valid
+0.8,1.05,0.7429354248405238,6,172.97757638595414,0,-172.97757638595414
+history
+
+solver Name,V_S,NPOPULATION,MAX_ITERATION,SEED
+openaies,8.5,5,30,1
