@@ -4,12 +4,13 @@ from es import CMAES, OpenES
 
 from ES_logic_multiple_runs import *
 
-from files_def_multiple_runs import create_config_file_ES
+from files_def_multiple_runs import *
 
 SIGMA_INIT_CMAES = 0.1
 SOLVER_NAME = 'cmaes'
 
 # === Start ===
+
 def run_multiple_Cmaes(NUMBER_OF_SEEDS_TO_RUN, V_S_list, NPOPULATION, MAX_ITERATION):
     global dir_run
 
@@ -34,17 +35,17 @@ def run_multiple_Cmaes(NUMBER_OF_SEEDS_TO_RUN, V_S_list, NPOPULATION, MAX_ITERAT
                     random.uniform(range_D[0],     range_D[1]),
                     random.uniform(range_AEdAO[0], range_AEdAO[1]),
                     random.uniform(range_PdD[0],   range_PdD[1])
-                  ]
+                    ]
 
             # defines CMA-ES algorithm solver
             cmaes = CMAES(NPARAMS,
-                          x0=x0,                     # initial parameters values to generate the population
-                          popsize=NPOPULATION,
-                          weight_decay=0.01,
-                          sigma_init = SIGMA_INIT_CMAES,
-                          lower_bounds=lower_bounds,
-                          upper_bounds=upper_bounds,
-                      )
+                            x0=x0,                     # initial parameters values to generate the population
+                            popsize=NPOPULATION,
+                            weight_decay=0.01,
+                            sigma_init = SIGMA_INIT_CMAES,
+                            lower_bounds=lower_bounds,
+                            upper_bounds=upper_bounds,
+                        )
 
             # dir for the seed execution
             dir_seed = dir_run +'/'+ str(V_S).replace('.','_') +'/' + str(seed)
@@ -61,14 +62,12 @@ def run_multiple_Cmaes(NUMBER_OF_SEEDS_TO_RUN, V_S_list, NPOPULATION, MAX_ITERAT
 if __name__ == '__main__':
     # run for this number of seeds
     NUMBER_OF_SEEDS_TO_RUN = 10
-    # NUMBER_OF_SEEDS_TO_RUN = 1
 
     # list of V_S, each V_S in the list will be run NUMBER_OF_SEEDS_TO_RUN times
     V_S_list = [7.0, 7.5, 8.0, 8.5]
-    # V_S_list = [7.0]
 
     # ES settings
-    NPOPULATION   = 10 # size of population
+    NPOPULATION   = 5 # size of population
     MAX_ITERATION = 30 # run solver for this generations
 
     run_multiple_Cmaes(NUMBER_OF_SEEDS_TO_RUN, V_S_list, NPOPULATION, MAX_ITERATION)

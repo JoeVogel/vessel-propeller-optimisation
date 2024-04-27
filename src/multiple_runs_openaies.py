@@ -34,18 +34,18 @@ def run_multiple_Openaies(NUMBER_OF_SEEDS_TO_RUN, V_S_list, NPOPULATION, MAX_ITE
                     random.uniform(range_D[0],     range_D[1]),
                     random.uniform(range_AEdAO[0], range_AEdAO[1]),
                     random.uniform(range_PdD[0],   range_PdD[1])
-                  ]
+                    ]
 
             # defines OpenAI's ES algorithm solver. Note that we needed to anneal the sigma parameter
             openaies = OpenES(NPARAMS,                 # number of model parameters
                             x0=x0,                     # initial parameters values to generate the population
                             sigma_init=SIGMA_INIT_OPENAIES, # initial standard deviation
-                            sigma_decay=0.999,         # don't anneal standard deviation
+                            sigma_decay=0.99,         # don't anneal standard deviation
                             learning_rate=0.1,         # learning rate for standard deviation
-                            learning_rate_decay = 1.0, # annealing the learning rate
+                            learning_rate_decay = 0.99, # annealing the learning rate
                             popsize=NPOPULATION,       # population size
                             antithetic=False,          # whether to use antithetic sampling
-                            weight_decay=0.00,         # weight decay coefficient
+                            weight_decay=0.01,         # weight decay coefficient
                             rank_fitness=False,        # use rank rather than fitness numbers
                             forget_best=False,
                             lower_bounds=lower_bounds, # list of lower bounds for the parameters
@@ -73,7 +73,7 @@ if __name__ == '__main__':
     V_S_list = [7.0, 7.5, 8.0, 8.5]
 
     # ES settings
-    NPOPULATION   = 10 # size of population
+    NPOPULATION   = 5 # size of population
     MAX_ITERATION = 30 # run solver for this generations
 
     run_multiple_Openaies(NUMBER_OF_SEEDS_TO_RUN, V_S_list, NPOPULATION, MAX_ITERATION)
