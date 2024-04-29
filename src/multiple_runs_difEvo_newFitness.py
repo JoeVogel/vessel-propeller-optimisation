@@ -143,8 +143,7 @@ def run_multiple_DifEvo_newFitness(NUMBER_OF_SEEDS_TO_RUN, V_S_list):
 
         results_list = []
         with Pool() as pool:
-            # seeds_list = [(dir_vs, seed, V_S) for seed in range(NUMBER_OF_SEEDS_TO_RUN)]
-            seeds_list = [(dir_vs, seed, V_S) for seed in [4]]
+            seeds_list = [(dir_vs, seed, V_S) for seed in range(NUMBER_OF_SEEDS_TO_RUN)]
             for result in pool.starmap(parallel_seed_run, seeds_list):
                 results_list.append(result)
 
@@ -157,7 +156,6 @@ if __name__ == '__main__':
     NUMBER_OF_SEEDS_TO_RUN = 10
 
     # list of V_S, each V_S in the list will be run NUMBER_OF_SEEDS_TO_RUN times
-    # V_S_list = [7.0, 7.5, 8.0, 8.5]
-    V_S_list = [8.5]
+    V_S_list = [7.0, 7.5, 8.0, 8.5]
 
     run_multiple_DifEvo_newFitness(NUMBER_OF_SEEDS_TO_RUN, V_S_list)
